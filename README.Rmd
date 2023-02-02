@@ -11,7 +11,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# plusign
+# mlr.mini
 
 <!-- badges: start -->
 [![r-cmd-check](https://github.com/fstermann/mlr-mini/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/maximilian-muecke/plusign/actions/workflows/r-cmd-check.yml)
