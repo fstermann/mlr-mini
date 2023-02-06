@@ -1,3 +1,4 @@
+#' @import checkmate
 test_that("Dataset throws an error if target not present in DataFrame", {
   badcalldf = data.frame(x = 1:3, y = c(TRUE, FALSE, TRUE))
   expect_error(Dataset(badcalldf, target = "z", type = "classification"),
