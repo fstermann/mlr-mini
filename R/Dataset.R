@@ -1,5 +1,6 @@
 # Creation class: "Dataset"
 #' @import checkmate
+#' @export
 Dataset <- function(data, target, type = c("regression", "classification"),
                     name = deparse(substitute(data), 20)) {
   assertString(type)

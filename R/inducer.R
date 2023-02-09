@@ -102,6 +102,7 @@ hyperparameters.Inducer <- function(x) {
   print(x$hyperparameters)
 }
 
+#' @export
 InducerLinearModel <- function(...) {
   inducer <- Inducer(
     name = "Linear Model",
@@ -172,4 +173,5 @@ InducerXgboost <- function(...) {
 }
 
 ind <- list()
+ind[["lm"]] <- InducerLinearModel
 ind[["xgboost"]] <- InducerXgboost
