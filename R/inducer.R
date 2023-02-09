@@ -10,6 +10,7 @@ Inducer <- function(name, configuration, hyperparameters) {
   ), class = "Inducer")
 }
 
+#' @export
 print.Inducer <- function(x, ...) {
   cat(
     "Inducer: ", x$name, "\n",
@@ -116,6 +117,7 @@ InducerLinearModel <- function(...) {
   inducer
 }
 
+#' @export
 train.InducerLinearModel <- function(inducer, dataset, weights = NULL, ...) {
   f <- get_formula(dataset)
   if (is.null(weights)) {
@@ -147,6 +149,7 @@ ModelLinearModel <- function(inducer, dataset, model) {
   )
 }
 
+#' @export
 predict.ModelLinearModel <- function(model, newdata, ...) {
   unname(predict(model$model, newdata = newdata, ...))
 }
