@@ -9,6 +9,9 @@ Dataset <- function(data, target, type = c("regression", "classification"),
   if(!target %in% colnames(data)) {
     stop(sprintf("Data does not contain target Column: %s", deparse(target)))
   }
+  if(type == "classification") {
+    stopifnot(class(data$target == "factor"))
+  }
   env <- new.env(parent = emptyenv())
   env$data <- data.table::as.data.table(data)
   result <- list(name = name,
@@ -25,12 +28,15 @@ print.Dataset <- function(x, ...) {
   invisible(x)
 }
 
-`[.Dataset` <- function(x, i, ...) {
+`[.Dataset` <- function(x, i, inplace = FALSE, ...) {
   if (!missing(..1)) {
     if(!x$target %in% ...)
       stop("Cannot remove target column ", deparse(x$target))
   }
   dimensions <- dim(x$env$data)
+  if (inplace == FALSE) {
+    return(x$env$data[i, ...])
+  }
   x$env$data <- x$env$data[i, ...]
   difference <- dimensions - dim(x$env$data)
   cat(sprintf("note: %s rows and %s columns have been deleted \n", difference[[1]], difference[[2]]))
