@@ -61,6 +61,12 @@ p_fct <- function(x) {
   p
 }
 
+p_lgl <- function(x) {
+  p <- Param(name = "logical", type = "logical", range = c(FALSE, TRUE))
+  class(p) <- c("LogicalParam", "Param")
+  p
+}
+
 hp <- function(...) {
   structure(list(...), class = "HyperparameterSet")
 }
@@ -86,12 +92,6 @@ configuration.Inducer <- function(x) {
 
 `configuration<-` <- function(x, value) {
   x$configuration <- value
-  invisible(x)
-}
-
-`$configuration<-` <- function(x, name, value) {
-  x$configuration[[name]] <- value
-  invisible(x)
 }
 
 hyperparameters <- function(x) {
@@ -111,25 +111,54 @@ InducerLinearModel <- function(...) {
       Param(name = "singular.ok", type = "numeric", range = c(0, 1))
     )
   )
-  class(inducer) <- c("InducerLM", "Inducer")
+  class(inducer) <- c("InducerLinearModel", "Inducer")
   inducer
 }
 
-train.InducerLinerModel <- function(inducer, dataset, weights = NULL, ...) {
+train.InducerLinearModel <- function(inducer, dataset, weights = NULL, ...) {
   f <- get_formula(dataset)
   if (is.null(weights)) {
-    stats::lm(f)
+    model <- stats::lm(f, data = dataset$env$data)
   } else {
-    stats::lm(f, weights = weights)
+    model <- stats::lm(f, weights = weights, data = dataset$env$data)
   }
+  ModelLinearModel(inducer = inducer, dataset = dataset, model = model)
+}
+
+Model <- function(inducer, dataset, model) {
+  structure(
+    list(inducer = inducer, dataset = dataset, model = model),
+    class = "Model"
+  )
+}
+
+ModelRegression <- function(inducer, dataset, model) {
+  structure(
+    list(inducer = inducer, dataset = dataset, model = model),
+    class = c("ModelRegression", "Model")
+  )
+}
+
+ModelLinearModel <- function(inducer, dataset, model) {
+  structure(
+    list(inducer, dataset = dataset, model = model),
+    class = c("ModelLinearModel", "ModelRegression", "Model")
+  )
+}
+
+predict.ModelLinearModel <- function(model, newdata, ...) {
+  unname(predict(model$model, newdata = newdata, ...))
 }
 
 get_formula <- function(dataset) {
   checkmate::assert_class(dataset, "Dataset")
-  f <- as.formula(paste0(dataset$target, " ~ ", paste(dataset$features, collapse = " + ")))
+  f <- as.formula(
+    paste0(dataset$target, " ~ ", paste(dataset$features, collapse = " + "))
+  )
   f
 }
 
+#' @export
 InducerXgboost <- function(...) {
   inducer <- Inducer(
     name = "XGBoost",
