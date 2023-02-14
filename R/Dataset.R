@@ -28,22 +28,24 @@ print.Dataset <- function(x, ...) {
 }
 
 #' @export
-`[.Dataset` <- function(x, i, ...) {
+`[.Dataset` <- function(x, i, inplace=FALSE, ...) {
   if (!missing(..1)) {
     if(!x$target %in% ...)
       stop("Cannot remove target column ", deparse(x$target))
   }
   
-  Dataset(data=x$env$data[i, ...],
-          target=x$target,
-          type = x$type,
-          name = x$name)
+  if (inplace == FALSE) {
+    Dataset(data=x$env$data[i, ...],
+            target=x$target,
+            type = x$type,
+            name = x$name)
+  }
   
-  # dimensions <- dim(x$env$data)
-  # x$env$data <- x$env$data[i, ...]
-  # difference <- dimensions - dim(x$env$data)
-  # cat(sprintf("note: %s rows and %s columns have been deleted \n", difference[[1]], difference[[2]]))
-  # invisible(x)
+  dimensions <- dim(x$env$data)
+  x$env$data <- x$env$data[i, ...]
+  difference <- dimensions - dim(x$env$data)
+  cat(sprintf("note: %s rows and %s columns have been deleted \n", difference[[1]], difference[[2]]))
+  invisible(x)
 }
 
 #' @export
