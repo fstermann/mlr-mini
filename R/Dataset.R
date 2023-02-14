@@ -20,12 +20,14 @@ Dataset <- function(data, target, type = c("regression", "classification"),
   structure(result, class = "Dataset")
 }
 
+#' @export
 print.Dataset <- function(x, ...) {
   cat(sprintf("Dataset %s, predicting %s (%s)\n", deparse(x$name), deparse(x$target), x$type))
   print(x$env$data)
   invisible(x)
 }
 
+#' @export
 `[.Dataset` <- function(x, i, ...) {
   if (!missing(..1)) {
     if(!x$target %in% ...)
@@ -38,6 +40,7 @@ print.Dataset <- function(x, ...) {
   invisible(x)
 }
 
+#' @export
 metainfo.Dataset <- function(x, ...) {
   types <- vapply(x$env$data, class, character(1))
   structure(list(features = types[names(types) == x$features],
@@ -46,4 +49,17 @@ metainfo.Dataset <- function(x, ...) {
                  type = x$type,
                  missings = sum(is.na(x$env$data))),
             class = "DatasetInfo")
+}
+
+#' @export
+nrow <- function(x, ...) {
+  UseMethod("nrow")
+}
+#' @export
+nrow.default <- function(x, ...) {
+  base::nrow(x)
+}
+#' @export
+nrow.Dataset <- function(x, ...) {
+  base::nrow(x$env$data)
 }
