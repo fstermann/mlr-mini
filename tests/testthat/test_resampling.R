@@ -43,3 +43,14 @@ test_that("CV Instantiator splits dataset uneven", {
   expect_equal(l.train, 13L)
   expect_equal(l.validation, 2 * 13L)
 })
+
+
+test_that("Resampling with LM", {
+  cv <- SplitCV(folds = 2L)
+  data <- Dataset(data.frame(x = 1:10, y = 10:1), target = "y", type = "regression", name = "MyDataset")
+  inducer <- ind$lm()
+
+  preds <- resample(data, inducer, cv)
+  expect_class(preds, "ResamplePrediction")
+  expect_equal(length(preds), 2L)
+})
