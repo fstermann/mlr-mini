@@ -33,11 +33,17 @@ print.Dataset <- function(x, ...) {
     if(!x$target %in% ...)
       stop("Cannot remove target column ", deparse(x$target))
   }
-  dimensions <- dim(x$env$data)
-  x$env$data <- x$env$data[i, ...]
-  difference <- dimensions - dim(x$env$data)
-  cat(sprintf("note: %s rows and %s columns have been deleted \n", difference[[1]], difference[[2]]))
-  invisible(x)
+  
+  Dataset(data=x$env$data[i, ...],
+          target=x$target,
+          type = x$type,
+          name = x$name)
+  
+  # dimensions <- dim(x$env$data)
+  # x$env$data <- x$env$data[i, ...]
+  # difference <- dimensions - dim(x$env$data)
+  # cat(sprintf("note: %s rows and %s columns have been deleted \n", difference[[1]], difference[[2]]))
+  # invisible(x)
 }
 
 #' @export
