@@ -64,6 +64,12 @@ length.SplitCVInstance <- function(x) {
   )
 }
 
+as.list.SplitInstance <- function(x) {
+  lapply(
+    seq(length(x)), function(i) x[[i]]
+  )
+}
+
 # TODO: Move this to a utils file
 collapse <- function(x) {
   out <- paste0(names(x), " = ", x)
@@ -79,7 +85,7 @@ collapse <- function(x) {
 #' @export
 print.Split <- function(x, ...) {
   cat(sprintf("%s Instantiator\n", class(x)[1]))
-  cat(sprintf("Configuration: %s", collapse(environment(x)$configuration)))
+  cat(sprintf("Configuration: %s\n", collapse(environment(x)$configuration)))
   invisible(x)
 }
 
@@ -96,9 +102,29 @@ print.SplitInstance <- function(x, ...) {
       class(x)[1], x$dataset.name, length(x$indices)
     )
   )
-  cat(sprintf("Configuration: %s", collapse(x$configuration)))
+  cat(sprintf("Configuration: %s\n", collapse(x$configuration)))
   invisible(x)
 }
 
 splt <- list()
 splt[["cv"]] <- SplitCV
+
+#' @title Resampler function
+#'
+#' @param dataset The Dataset object to resample
+#' @param inducer The Inducer Model to use for prediction
+#' @param splitClass The Split class to use
+#'
+#' @export
+resample <- function(dataset, inducer, splitClass) {
+  assertClass(dataset, "Dataset")
+  assertClass(inducer, "Inducer")
+  assertClass(splitClass, "Split")
+
+  data.split <- splitClass(dataset)
+  predictions <- lapply(
+    as.list(data.split),
+    function(x) predict(train(inducer, dataset[x$train, ]), newdata = dataset[x$validation, ]$env$data)
+  )
+  structure(predictions, class = "ResamplePrediction")
+}
