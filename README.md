@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![r-cmd-check](https://github.com/fstermann/mlr-mini/actions/workflows/r-cmd-check.yaml/badge.svg)](https://github.com/fstermann/mlr-mini/actions/workflows/r-cmd-check.yaml)
+[![r-cmd-check](https://github.com/fstermann/mlr-mini/actions/workflows/r-cmd-check.yml/badge.svg)](https://github.com/fstermann/mlr-mini/actions/workflows/r-cmd-check.yml)
 [![Codecov test
 coverage](https://codecov.io/gh/fstermann/mlr-mini/branch/main/graph/badge.svg)](https://app.codecov.io/gh/fstermann/mlr-mini?branch=main)
 <!-- badges: end -->
