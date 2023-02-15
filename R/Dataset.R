@@ -1,4 +1,10 @@
-# Creation class: "Dataset"
+#' @title Creation class: "Dataset"
+#' 
+#' @param data Data, either a data.table or data.frame
+#' @param target Target column
+#' @param type Type of the task. One of c("regression", "classification")
+#' @param name Name of the dataset
+#' 
 #' @import checkmate
 #' @export
 Dataset <- function(data, target, type = c("regression", "classification"),
