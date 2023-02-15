@@ -1,10 +1,17 @@
 Package: mlr.mini
-Title: What the Package Does (One Line, Title Case)
+Title: Minimal Machine Learning in R
 Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+Description: This package is a minimal version of the `mlr` library.
+  It was developed as part of the 'Advanced Programming' course held 
+  at the LMU Munich in 2022/23 by Martin Binder and Daniel Schalk.
+Authors@R: c(
+  person("Fabian", "Stermann", email = "fabian.stermann@campus.lmu.de", role = c("aut", "cre"))
+  person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
+  person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
+  person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
+)
+URL: https://github.com/fstermann/mlr-mini
+BugReports: https://github.com/fstermann/mlr-mini/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
