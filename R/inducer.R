@@ -104,9 +104,9 @@ hyperparameters.Inducer <- function(x) {
 }
 
 #' @title Linear Model
-#' 
+#'
 #' @param ... Arguments passed to initializer
-#' 
+#'
 #' @export
 InducerLinearModel <- function(...) {
   inducer <- Inducer(
@@ -153,9 +153,15 @@ ModelLinearModel <- function(inducer, dataset, model) {
   )
 }
 
+#' @title Predict with a Linear Model
+#' 
+#' @param object The model object to predict with
+#' @param newdata New data to make predictions on
+#' @param ... Further arguments passed to `predict`
+#'
 #' @export
-predict.ModelLinearModel <- function(object, ...) {
-  unname(stats::predict(object$model, ...))
+predict.ModelLinearModel <- function(object, newdata, ...) {
+  unname(stats::predict(object$model, newdata = newdata, ...))
 }
 
 get_formula <- function(dataset) {
@@ -167,9 +173,9 @@ get_formula <- function(dataset) {
 }
 
 #' @title XGBoost
-#' 
+#'
 #' @param ... Arguments passed to initializer
-#' 
+#'
 #' @export
 InducerXgboost <- function(...) {
   inducer <- Inducer(
