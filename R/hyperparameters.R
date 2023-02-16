@@ -1,107 +1,163 @@
-Hyperparameter <- function(name, type, range) {
-  checkmate::assert_character(name)
+Hyperparameter <- function(type, range) {
+  # checkmate::assert_character(name)
   checkmate::assert_choice(type, c("numeric", "integer", "logical", "factor"))
-  structure(list(
-    name = name,
-    type = type,
-    range = range
-  ), class = "Hyperparameter")
+
+  class(range) <- "Range"
+
+  structure(
+    list(
+      type = type,
+      range = range
+    ),
+    class = "Hyperparameter"
+  )
+}
+
+format.Range <- function(x, ...) paste(x, collapse = ", ")
+
+format.NumericRange <- function(x, ...) sprintf("[%s, %s]", x[1], x[2])
+
+format.FactorRange <- function(x, max.display = 3, ...) {
+  len <- length(levels(x))
+  if (is.logical(max.display) && max.display) max.display <- len
+
+  x.cut <- levels(x)[seq(min(max.display, len))]
+  x.preview <- paste0("'", paste(x.cut, collapse = "', '"), "'")
+  sprintf(
+    "{%s%s} (%s level%s)",
+    x.preview,
+    if (len > max.display) ", ..." else "",
+    len,
+    if (len != 1) "s" else ""
+  )
+}
+
+print.Range <- function(x, ...) {
+  cat(format(x))
+  invisible(x)
 }
 
 #' @title Double Hyperparameter
-#' 
+#'
 #' @param lower Lower bound of the hyperparameter. Defaults to -Inf.
 #' @param upper Upper bound of the hyperparameter. Defaults to Inf.
-#' 
+#'
 #' @import checkmate
 #' @export
-p_dbl <- function(lower=-Inf, upper=Inf) {
+p_dbl <- function(lower = -Inf, upper = Inf) {
   checkmate::assert_numeric(lower)
   checkmate::assert_numeric(upper)
-  p <- Hyperparameter(name = "double", type = "numeric", range = c(lower, upper))
+  p <- Hyperparameter(type = "numeric", range = c(lower, upper))
   class(p) <- c("DoubleHyperparameter", class(p))
+  class(p$range) <- c("NumericRange", class(p$range))
   p
 }
 
 #' @title Integer Hyperparameter
-#' 
+#'
 #' @param lower Lower bound of the hyperparameter. Defaults to -Inf.
 #' @param upper Upper bound of the hyperparameter. Defaults to Inf.
-#' 
+#'
 #' @import checkmate
 #' @export
-p_int <- function(lower=-Inf, upper=Inf) {
-  checkmate::assert_numeric(lower)
-  checkmate::assert_numeric(upper)
-  p <- Hyperparameter(name = "integer", type = "integer", range = c(lower, upper))
+p_int <- function(lower = -Inf, upper = Inf) {
+  if (!is.infinite(lower)) checkmate::assertIntegerish(lower, upper = upper)
+  if (!is.infinite(upper)) checkmate::assertIntegerish(upper, lower = lower)
+  p <- Hyperparameter(type = "integer", range = c(lower, upper))
   class(p) <- c("IntegerHyperparameter", class(p))
+  class(p$range) <- c("NumericRange", class(p$range))
   p
 }
 
 #' @title Factor Hyperparameter
-#' 
+#'
 #' @param x Factor values.
-#' 
+#'
 #' @import checkmate
 #' @export
 p_fct <- function(x) {
-  p <- Hyperparameter(name = "factor", type = "factor", range = as.factor(x))
+  p <- Hyperparameter(type = "factor", range = as.factor(x))
   class(p) <- c("FactorHyperparameter", class(p))
+  class(p$range) <- c("FactorRange", class(p$range))
   p
 }
 
 #' @title Logical/Boolean Hyperparameter
-#' 
-#' @param x Logical value. Defaults to TRUE.
-#' 
+#'
 #' @import checkmate
 #' @export
-p_lgl <- function(x = TRUE) {
-  p <- Hyperparameter(name = "logical", type = "logical", range = c(FALSE, TRUE))
+p_lgl <- function() {
+  p <- Hyperparameter(type = "logical", range = c(FALSE, TRUE))
   class(p) <- c("LogicalHyperparameter", class(p))
+  class(p$range) <- c("NumericRange", class(p$range))
   p
 }
 
+
+# Predefined hyperparameter names, in case no name is given for a specific hp.
+# > x, y, z, a, b, ..., w
+HP_NAMES <- c(tail(letters, -23), head(letters, 23))
+
 HyperparameterSpace <- function(...) {
-  structure(list(...), class = "HyperparameterSpace")
+  hps <- list(...)
+  checkmate::assertList(hps)
+
+  # Assure no missing and unique names
+  nm <- names(hps)
+  if (is.null(nm)) {
+    nm <- HP_NAMES[seq(length(hps))]
+  } else {
+    n.missing <- sum(nm == "")
+    nm[nm == ""] <- HP_NAMES[!HP_NAMES %in% nm][seq(n.missing)]
+  }
+  names(hps) <- make.names(nm, unique = TRUE)
+
+  structure(hps, class = "HyperparameterSpace")
 }
 hp <- HyperparameterSpace
 
+
 print.HyperparameterSpace <- function(x, ...) {
-  cat("Hyperparameter set:\n")
-  for (i in seq_along(x)) {
-    cat(
-      "  ", x[[i]]$name, " = ", x[[i]]$type, "\n",
-      sep = ""
-    )
-  }
-  invisible(x)
+  hp.types <- sapply(x, function(x) x$type)
+  hp.ranges <- sapply(x, function(x) format(x$range))
+
+  dt <- data.table::data.table(
+    name = names(x),
+    type = hp.types,
+    range = hp.ranges
+  )
+  print(dt)
+  invisible(dt)
 }
 
-checkHyperparameter = function(hp, hp.space) {
+checkHyperparameter <- function(hp, hp.space) {
   checkmate::assertClass(hp.space, "HyperparameterSpace")
-  
-  for (hp.name in names(hp)) {
-    p = hp[[hp.name]]
-    p.space = hp.space[[hp.name]]
-    valid = assertValidHP(p, p.space)
-    print(sprintf("Parameter %s is valid: %s", hp.name, valid))
-  }
+  checkmate::assertList(hp)
+  checkmate::assertSubset(names(hp), names(hp.space))
+
+  setNames(
+    lapply(
+      names(hp),
+      function(x) assertValidHP(hp.space[[x]], value = hp[[x]])
+    ),
+    names(hp)
+  )
 }
 
-assertValidHP = function(x, value, ...) UseMethod("assertValidHP")
-assertValidHP.DoubleHyperparameter = function(x, value, ...) {
-  checkmate::assert_numeric(value)
-  x$range[0] <= value && value <= x$range[0]
+assertValidHP <- function(x, value, ...) UseMethod("assertValidHP", x)
+assertValidHP.DoubleHyperparameter <- function(x, value, ...) {
+  checkmate::qtest(value, sprintf("%s%s", "R", format(x$range)))
 }
-assertValidHP.IntegerHyperparameter = function(x, value, ...) {
-  checkmate::assert_numeric(value)
-  x$range[0] <= value && value <= x$range[0]
+assertValidHP.IntegerHyperparameter <- function(x, value, ...) {
+  if (is.infinite(value)) type <- "R" else type <- "X"
+  checkmate::qtest(value, sprintf("%s%s", type, format(x$range)))
 }
-assertValidHP.FactorHyperparameter = function(x, value, ...) {
-  value %in% x$range
+assertValidHP.FactorHyperparameter <- function(x, value, ...) {
+  valid <- value %in% levels(x$range)
+  if (!valid) cat(sprintf("Must be element of set %s, but is '%s'\n", format(x$range, max.display = TRUE), value))
+  valid
 }
-assertValidHP.LogicalHyperparameter = function(x, value, ...) {
+assertValidHP.LogicalHyperparameter <- function(x, value, ...) {
   checkmate::assertLogical(value)
   value %in% x$range # Probably not needed, since it would be a constant with length(range()) == 1
 }
@@ -111,70 +167,3 @@ assertValidHP.LogicalHyperparameter = function(x, value, ...) {
 hyperparameters <- function(x) {
   UseMethod("hyperparameters", x)
 }
-
-
-# hyperparameter <- function(type, range) {
-#   data <- list(type = type, range = range)
-#   structure(data, class = "Hyperparameter")
-# }
-#
-# hp_range <- function(values) {
-#   structure(list(values = values),
-#     class = "HpRange"
-#   )
-# }
-#
-#
-#
-# p_dbl <- function(x_min = -Inf, x_max = Inf) {
-#   checkmate::assertDouble(x_min, upper = x_max)
-#   checkmate::assertDouble(x_max, lower = x_min)
-#
-#   range <- hp_range(values = c(x_min, x_max))
-#   hyperparameter(type = "dbl", range = range)
-# }
-#
-# p_int <- function(x_min = -Inf, x_max = Inf) {
-#   checkmate::assertInt(x_min, upper = x_max)
-#   checkmate::assertInt(x_max, lower = x_min)
-#
-#   range <- hp_range(values = c(x_min, x_max))
-#   hyperparameter(type = "int", range = range)
-# }
-#
-# p_fct <- function(...) {
-#   range <- hp_range(values = as.factor(c(...)))
-#   hyperparameter(type = "fct", range = range)
-# }
-#
-#
-# hp <- function(...) {
-#   hps <- list(...)
-#
-#   structure(hps, class = "hp")
-# }
-#
-#
-# print.hp <- function(x, ...) {
-#   # hp.names = names(x)
-#
-#   dt <- cbind(name = names(x), data.table::rbindlist(x))
-#
-#   # Format hyperparameter ranges
-#   hp.ranges <- sapply(dt$range, function(x) paste(x, collapse = ", "))
-#   hp.format = ifelse(dt$type == "fct", "{%s}", "[%s]")
-#   dt$range <- mapply(sprintf, hp.format, hp.ranges)
-#
-#   print(dt)
-#   invisible(x)
-# }
-#
-#
-# hp(x = p_dbl(0, 1), y = p_int(-2, 2), z = p_fct("a", "b", "c"))
-#
-#
-#
-#
-# checkHyperparameter <- function(hp.params, hp.config) {
-#   TRUE
-# }
