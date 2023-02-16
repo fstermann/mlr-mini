@@ -6,6 +6,6 @@ test_that("Dataset throws an error if target not present in DataFrame", {
 test_that("Dataset throws when trying to remove target column", {
   data <- data.frame(x = 1:10, y = 1:10)
   dataset <- Dataset(data, type = "classification", target = "y")
-  expect_error(dataset[c(1,2), "x"],
+  expect_error(dataset[c(1,2), "x", inplace=TRUE],
                sprintf('Cannot remove target column "y"'))
 })
