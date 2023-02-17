@@ -18,5 +18,5 @@ Unique names are ensured.
 }
 \examples{
 HyperparameterSpace(p_int(0, 9), p_dbl(lower = 0))
-hp(p_fct(category = c("a", "b", "c")), alpha = p_dbl(0, 1))
+hp(category = p_fct(c("a", "b", "c")), alpha = p_dbl(0, 1))
 }

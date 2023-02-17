@@ -65,15 +65,31 @@ metainfo.Dataset <- function(x, ...) {
             class = "DatasetInfo")
 }
 
+#' The Number of Rows of an Array
+#' 
+#' @param x The array/object to return rows for
+#' 
 #' @export
-nrow <- function(x, ...) {
+nrow <- function(x) {
   UseMethod("nrow")
 }
+
+#' The Number of Rows of an Array
+#' 
+#' @param x The array/object to return rows for
+#' 
 #' @export
-nrow.default <- function(x, ...) {
+nrow.default <- function(x) {
   base::nrow(x)
 }
+
+#' The Number of Rows of a `Dataset` object
+#' 
+#' Uses `base::nrow` under the hood
+#' 
+#' @param x The Dataset
+#' 
 #' @export
-nrow.Dataset <- function(x, ...) {
+nrow.Dataset <- function(x) {
   base::nrow(x$env$data)
 }

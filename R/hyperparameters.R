@@ -174,6 +174,7 @@ print.HyperparameterSpace <- function(x, ...) {
 #' hp.space <- hp(x = p_int(0, 9), y = p_dbl(lower = 0))
 #' checkHyperparameter(list(x = 5, y = 2.5), hp.space)
 #' @import checkmate
+#' @import stats
 #' @export
 checkHyperparameter <- function(hp, hp.space) {
   checkmate::assertClass(hp.space, "HyperparameterSpace")
@@ -181,7 +182,7 @@ checkHyperparameter <- function(hp, hp.space) {
   checkmate::assertCharacter(names(hp), unique = TRUE, any.missing = FALSE, null.ok = FALSE)
   checkmate::assertSubset(names(hp), names(hp.space))
 
-  setNames(
+  stats::setNames(
     lapply(
       names(hp),
       function(x) checkValidHP(hp.space[[x]], value = hp[[x]])
