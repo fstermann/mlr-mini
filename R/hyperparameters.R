@@ -1,9 +1,7 @@
 Hyperparameter <- function(type, range) {
-  # checkmate::assert_character(name)
   checkmate::assert_choice(type, c("numeric", "integer", "logical", "factor"))
 
   class(range) <- "Range"
-
   structure(
     list(
       type = type,
@@ -37,7 +35,9 @@ print.Range <- function(x, ...) {
   invisible(x)
 }
 
-#' @title Double Hyperparameter
+#' Double Hyperparameter
+#'
+#' Generate a Hyperparameter of type `Double`
 #'
 #' @param lower Lower bound of the hyperparameter. Defaults to -Inf.
 #' @param upper Upper bound of the hyperparameter. Defaults to Inf.
@@ -53,7 +53,9 @@ p_dbl <- function(lower = -Inf, upper = Inf) {
   p
 }
 
-#' @title Integer Hyperparameter
+#' Integer Hyperparameter
+#'
+#' Generate a Hyperparameter of type `Integer`
 #'
 #' @param lower Lower bound of the hyperparameter. Defaults to -Inf.
 #' @param upper Upper bound of the hyperparameter. Defaults to Inf.
@@ -69,7 +71,9 @@ p_int <- function(lower = -Inf, upper = Inf) {
   p
 }
 
-#' @title Factor Hyperparameter
+#' Factor Hyperparameter
+#'
+#' Generate a Hyperparameter of type `Factor`
 #'
 #' @param x Factor values.
 #'
@@ -82,7 +86,9 @@ p_fct <- function(x) {
   p
 }
 
-#' @title Logical/Boolean Hyperparameter
+#' Logical/Boolean Hyperparameter
+#'
+#' Generate a Hyperparameter of type `Logical`
 #'
 #' @import checkmate
 #' @export
@@ -98,6 +104,17 @@ p_lgl <- function() {
 # > x, y, z, a, b, ..., w
 HP_NAMES <- c(tail(letters, -23), head(letters, 23))
 
+#' Combine Hyperparameter objetcs into a Hyperparameter Space
+#'
+#' If there are unnamed Hyperparameters given, we start naming them from x, y, z, a, ...
+#' Unique names are ensured.
+#'
+#' @param ... List of named or unnamed Hyperparameters
+#'
+#' @examples
+#' HyperparameterSpace(p_int(0, 9), p_dbl(lower = 0))
+#' hp(p_fct(category = c("a", "b", "c")), alpha = p_dbl(0, 1))
+#' @export
 HyperparameterSpace <- function(...) {
   hps <- list(...)
   checkmate::assertList(hps)
@@ -114,6 +131,9 @@ HyperparameterSpace <- function(...) {
 
   structure(hps, class = "HyperparameterSpace")
 }
+
+#' @rdname HyperparameterSpace
+#' @export
 hp <- HyperparameterSpace
 
 
@@ -130,9 +150,24 @@ print.HyperparameterSpace <- function(x, ...) {
   invisible(dt)
 }
 
+#' Check if list values lie in a given HyperparameterSpace
+#'
+#' This checks if a named lists values lie in a given HyperparameterSpace.
+#'
+#' @param hp List of named Hyperparameter values
+#' @param hp.space HyperparameterSpace used as reference
+#'
+#' @return List with names of `hp` and logical values indicating if the value lies in the given HyperparameterSpace
+#'
+#' @examples
+#' hp.space <- hp(x = p_int(0, 9), y = p_dbl(lower = 0))
+#' checkHyperparameter(list(x = 5, y = 2.5), hp.space)
+#' @import checkmate
+#' @export
 checkHyperparameter <- function(hp, hp.space) {
   checkmate::assertClass(hp.space, "HyperparameterSpace")
   checkmate::assertList(hp)
+  checkmate::assertCharacter(names(hp), unique = TRUE, any.missing = FALSE, null.ok = FALSE)
   checkmate::assertSubset(names(hp), names(hp.space))
 
   setNames(
@@ -161,7 +196,6 @@ assertValidHP.LogicalHyperparameter <- function(x, value, ...) {
   checkmate::assertLogical(value)
   value %in% x$range # Probably not needed, since it would be a constant with length(range()) == 1
 }
-
 
 
 hyperparameters <- function(x) {
