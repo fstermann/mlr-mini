@@ -56,8 +56,8 @@ InducerLinearModel <- function(...) {
     name = "Linear Model",
     configuration = list(..., verbose = 0),
     hyperparameters = list(
-      Param(name = "tol", type = "numeric", range = c(0, 1)),
-      Param(name = "singular.ok", type = "numeric", range = c(0, 1))
+      tol = p_dbl(0, 1), # Tolerance?
+      singular.ok = p_lgl()
     )
   )
   class(inducer) <- c("InducerLinearModel", "Inducer")
@@ -125,7 +125,7 @@ InducerXgboost <- function(...) {
     name = "XGBoost",
     configuration = list(..., verbose = 0),
     hyperparameters = list(
-      Param("eta", "numeric", range = c(0.01, 0.2)),
+      eta = p_dbl(0.01, 0.2)
     )
   )
   class(inducer) <- c("InducerXgboost", "Inducer")
