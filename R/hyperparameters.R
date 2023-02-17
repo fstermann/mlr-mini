@@ -123,7 +123,7 @@ HP_NAMES <- c(tail(letters, -23), head(letters, 23))
 #'
 #' @examples
 #' HyperparameterSpace(p_int(0, 9), p_dbl(lower = 0))
-#' hp(p_fct(category = c("a", "b", "c")), alpha = p_dbl(0, 1))
+#' hp(category = p_fct(c("a", "b", "c")), alpha = p_dbl(0, 1))
 #' @export
 HyperparameterSpace <- function(...) {
   hps <- list(...)
