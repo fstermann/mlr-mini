@@ -211,3 +211,7 @@ checkValidHP.LogicalHyperparameter <- function(x, value, ...) {
 hyperparameters <- function(x) {
   UseMethod("hyperparameters", x)
 }
+hyperparameters.default <- function(x) {
+  if (is.null(attr(x, "hyperparameters"))) stop(sprintf("Object %s has no hyperparameter attribute", x))
+  x$hyperparameters
+}
