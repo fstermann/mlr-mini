@@ -110,5 +110,5 @@ test_that("checkHyperparameter unnamed", {
 test_that("checkHyperparameter name unknown", {
   hp.space <- hp(x = p_dbl(lower = 0))
 
-  expect_error(checkHyperparameter(list(unknownX = 1), hp.space), "Assertion on 'names\\(hp\\)' failed: Must be a subset of \\{'x'\\}, but is \\{'unknownX'\\}")
+  expect_error(checkHyperparameter(list(unknownX = 1), hp.space), "Assertion on 'names\\(hp\\)' failed: Must be a subset of \\{'x'\\}, but +.* \\{'unknownX'\\}")
 })
