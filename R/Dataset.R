@@ -1,4 +1,10 @@
-# Creation class: "Dataset"
+#' @title Creation class: "Dataset"
+#' 
+#' @param data Data, either a data.table or data.frame
+#' @param target Target column
+#' @param type Type of the task. One of c("regression", "classification")
+#' @param name Name of the dataset
+#' 
 #' @import checkmate
 #' @export
 Dataset <- function(data, target, type = c("regression", "classification"),
@@ -20,24 +26,38 @@ Dataset <- function(data, target, type = c("regression", "classification"),
   structure(result, class = "Dataset")
 }
 
+#' @export
 print.Dataset <- function(x, ...) {
   cat(sprintf("Dataset %s, predicting %s (%s)\n", deparse(x$name), deparse(x$target), x$type))
   print(x$env$data)
   invisible(x)
 }
 
-`[.Dataset` <- function(x, i, ...) {
+#' @export
+`[.Dataset` <- function(x, i, inplace=FALSE, ...) {
   if (!missing(..1)) {
     if(!x$target %in% ...)
       stop("Cannot remove target column ", deparse(x$target))
   }
+  
+  columns <- c(...)
+  if (is.null(columns)) columns <- names(x$env$data)
+  
+  if (inplace == FALSE) {
+    return(Dataset(data=x$env$data[i, columns],
+            target=x$target,
+            type = x$type,
+            name = x$name))
+  }
+  
   dimensions <- dim(x$env$data)
-  x$env$data <- x$env$data[i, ...]
+  x$env$data <- x$env$data[i, columns]
   difference <- dimensions - dim(x$env$data)
   cat(sprintf("note: %s rows and %s columns have been deleted \n", difference[[1]], difference[[2]]))
   invisible(x)
 }
 
+#' @export
 metainfo.Dataset <- function(x, ...) {
   types <- vapply(x$env$data, class, character(1))
   structure(list(features = types[names(types) == x$features],
@@ -46,4 +66,17 @@ metainfo.Dataset <- function(x, ...) {
                  type = x$type,
                  missings = sum(is.na(x$env$data))),
             class = "DatasetInfo")
+}
+
+#' @export
+nrow <- function(x, ...) {
+  UseMethod("nrow")
+}
+#' @export
+nrow.default <- function(x, ...) {
+  base::nrow(x)
+}
+#' @export
+nrow.Dataset <- function(x, ...) {
+  base::nrow(x$env$data)
 }
