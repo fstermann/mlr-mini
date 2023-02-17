@@ -204,8 +204,7 @@ checkValidHP.FactorHyperparameter <- function(x, value, ...) {
   valid
 }
 checkValidHP.LogicalHyperparameter <- function(x, value, ...) {
-  checkmate::assertLogical(value)
-  value %in% x$range # Probably not needed, since it would be a constant with length(range()) == 1
+  checkmate::qtest(value, "B")
 }
 
 
