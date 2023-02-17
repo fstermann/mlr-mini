@@ -11,10 +11,13 @@ Hyperparameter <- function(type, range) {
   )
 }
 
+#' @export
 format.Range <- function(x, ...) paste(x, collapse = ", ")
 
+#' @export
 format.NumericRange <- function(x, ...) sprintf("[%s, %s]", x[1], x[2])
 
+#' @export
 format.FactorRange <- function(x, max.display = 3, ...) {
   len <- length(levels(x))
   if (is.logical(max.display) && max.display) max.display <- len
@@ -30,8 +33,15 @@ format.FactorRange <- function(x, max.display = 3, ...) {
   )
 }
 
+#' @export
 print.Range <- function(x, ...) {
   cat(format(x))
+  invisible(x)
+}
+
+#' @export
+print.Hyperparameter <- function(x, ...) {
+  cat(sprintf("Hyperparamter\n  Type:  %s\n  Range: %s", x$type, format(x$range)))
   invisible(x)
 }
 
@@ -136,7 +146,8 @@ HyperparameterSpace <- function(...) {
 #' @export
 hp <- HyperparameterSpace
 
-
+#' @import data.table
+#' @export
 print.HyperparameterSpace <- function(x, ...) {
   hp.types <- sapply(x, function(x) x$type)
   hp.ranges <- sapply(x, function(x) format(x$range))
@@ -173,26 +184,26 @@ checkHyperparameter <- function(hp, hp.space) {
   setNames(
     lapply(
       names(hp),
-      function(x) assertValidHP(hp.space[[x]], value = hp[[x]])
+      function(x) checkValidHP(hp.space[[x]], value = hp[[x]])
     ),
     names(hp)
   )
 }
 
-assertValidHP <- function(x, value, ...) UseMethod("assertValidHP", x)
-assertValidHP.DoubleHyperparameter <- function(x, value, ...) {
+checkValidHP <- function(x, value, ...) UseMethod("checkValidHP", x)
+checkValidHP.DoubleHyperparameter <- function(x, value, ...) {
   checkmate::qtest(value, sprintf("%s%s", "R", format(x$range)))
 }
-assertValidHP.IntegerHyperparameter <- function(x, value, ...) {
+checkValidHP.IntegerHyperparameter <- function(x, value, ...) {
   if (is.infinite(value)) type <- "R" else type <- "X"
   checkmate::qtest(value, sprintf("%s%s", type, format(x$range)))
 }
-assertValidHP.FactorHyperparameter <- function(x, value, ...) {
+checkValidHP.FactorHyperparameter <- function(x, value, ...) {
   valid <- value %in% levels(x$range)
   if (!valid) cat(sprintf("Must be element of set %s, but is '%s'\n", format(x$range, max.display = TRUE), value))
   valid
 }
-assertValidHP.LogicalHyperparameter <- function(x, value, ...) {
+checkValidHP.LogicalHyperparameter <- function(x, value, ...) {
   checkmate::assertLogical(value)
   value %in% x$range # Probably not needed, since it would be a constant with length(range()) == 1
 }
