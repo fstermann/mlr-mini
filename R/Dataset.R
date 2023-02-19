@@ -34,24 +34,21 @@ print.Dataset <- function(x, ...) {
 }
 
 #' @export
-`[.Dataset` <- function(x, i, inplace=FALSE, ...) {
-  if (!missing(..1)) {
-    if(!x$target %in% ...)
+`[.Dataset` <- function(x, i, j, inplace=FALSE, ...) {
+  if (!missing(j)) {
+    if(!x$target %in% j)
       stop("Cannot remove target column ", deparse(x$target))
   }
   
-  columns <- c(...)
-  if (is.null(columns)) columns <- names(x$env$data)
-  
   if (inplace == FALSE) {
-    return(Dataset(data=x$env$data[i, columns],
+    return(Dataset(data=x$env$data[i, j],
             target=x$target,
             type = x$type,
             name = x$name))
   }
   
   dimensions <- dim(x$env$data)
-  x$env$data <- x$env$data[i, columns]
+  x$env$data <- x$env$data[i, j]
   difference <- dimensions - dim(x$env$data)
   cat(sprintf("note: %s rows and %s columns have been deleted \n", difference[[1]], difference[[2]]))
   invisible(x)
@@ -68,15 +65,31 @@ metainfo.Dataset <- function(x, ...) {
             class = "DatasetInfo")
 }
 
+#' The Number of Rows of an Array
+#' 
+#' @param x The array/object to return rows for
+#' 
 #' @export
-nrow <- function(x, ...) {
+nrow <- function(x) {
   UseMethod("nrow")
 }
+
+#' The Number of Rows of an Array
+#' 
+#' @param x The array/object to return rows for
+#' 
 #' @export
-nrow.default <- function(x, ...) {
+nrow.default <- function(x) {
   base::nrow(x)
 }
+
+#' The Number of Rows of a `Dataset` object
+#' 
+#' Uses `base::nrow` under the hood
+#' 
+#' @param x The Dataset
+#' 
 #' @export
-nrow.Dataset <- function(x, ...) {
+nrow.Dataset <- function(x) {
   base::nrow(x$env$data)
 }
