@@ -19,15 +19,60 @@
     <loc>/reference/Dataset.html</loc>
   </url>
   <url>
+    <loc>/reference/HyperparameterSpace.html</loc>
+  </url>
+  <url>
     <loc>/reference/InducerLinearModel.html</loc>
   </url>
   <url>
     <loc>/reference/InducerXgboost.html</loc>
   </url>
   <url>
+    <loc>/reference/SplitCV.html</loc>
+  </url>
+  <url>
+    <loc>/reference/checkHyperparameter.html</loc>
+  </url>
+  <url>
     <loc>/reference/index.html</loc>
   </url>
   <url>
+    <loc>/reference/length.SplitCVInstance.html</loc>
+  </url>
+  <url>
+    <loc>/reference/nrow.Dataset.html</loc>
+  </url>
+  <url>
+    <loc>/reference/nrow.default.html</loc>
+  </url>
+  <url>
+    <loc>/reference/nrow.html</loc>
+  </url>
+  <url>
+    <loc>/reference/p_dbl.html</loc>
+  </url>
+  <url>
+    <loc>/reference/p_fct.html</loc>
+  </url>
+  <url>
+    <loc>/reference/p_int.html</loc>
+  </url>
+  <url>
+    <loc>/reference/p_lgl.html</loc>
+  </url>
+  <url>
     <loc>/reference/predict.ModelLinearModel.html</loc>
+  </url>
+  <url>
+    <loc>/reference/print.Split.html</loc>
+  </url>
+  <url>
+    <loc>/reference/print.SplitInstance.html</loc>
+  </url>
+  <url>
+    <loc>/reference/resample.html</loc>
+  </url>
+  <url>
+    <loc>/reference/sub-sub-.SplitCVInstance.html</loc>
   </url>
 </urlset>
